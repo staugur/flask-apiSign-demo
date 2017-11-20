@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>JavaScript Client</title>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <style type="text/css">
+        pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+        .string { color: green; }
+        .number { color: darkorange; }
+        .boolean { color: blue; }
+        .null { color: magenta; }
+        .key { color: red; }
+    </style>
+</head>
+<body>
+<pre id="result"></pre>
+<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+<script type="text/javascript">
+    var version = "v1";
+    var accesskey_id = "demo_id";
+    var accesskey_secret = "demo_secret";
+    function _sign(params) {
+        /*
+            @params object: uri请求参数(包含除signature外的公共参数)
+        */
+        if( typeof(params)!="object" ) {
+            console.error("params is not an object");
+            return false;
+        }
+        // NO.1 参数排序
+        var _my_sorted = Object.keys(params).sort();
+        // NO.2 排序后拼接字符串
+        var canonicalizedQueryString = '';
+        for (var _i in _my_sorted) {
+            canonicalizedQueryString += _my_sorted[_i] + '=' + params[_my_sorted[_i]] + '&';
+        }
+        canonicalizedQueryString += accesskey_secret
+        // NO.3 加密返回签名: signature
+        return md5(canonicalizedQueryString).toUpperCase();
+    }
+    function make_url(params) {
+        /*
+            @params object: uri请求参数(不包含公共参数)
+        */
+        if( typeof(params)!="object" ) {
+            console.warn("params is not an object, set {}");
+            var params = {};
+        }
+        // 获取当前时间戳
+        var timestamp = Math.round(new Date().getTime() / 1000 - 5).toString();
+        console.log(timestamp);
+        // 设置公共参数
+        var publicParams = { accesskey_id: accesskey_id, version: version, timestamp: timestamp };
+        // 添加加公共参数
+        for (var i in publicParams) {
+            params[i] = publicParams[i];
+        }
+        var uri = ''
+        for (var i in params) {
+            uri += i + '=' + params[i] + '&';
+        }
+        uri += 'signature=' + _sign(params);
+        console.log(uri);
+        return uri
+    }
+    function syntaxHighlight(json) {
+        if (typeof json != 'string') {
+            json = JSON.stringify(json, undefined, 4);
+        }
+        json = json.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
+        return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(match) {
+            var cls = 'number';
+            if (/^"/.test(match)) {
+                if (/:$/.test(match)) {
+                    cls = 'key';
+                } else {
+                    cls = 'string';
+                }
+            } else if (/true|false/.test(match)) {
+                cls = 'boolean';
+            } else if (/null/.test(match)) {
+                cls = 'null';
+            }
+            return '<span class="' + cls + '">' + match + '</span>';
+        });
+    }
+    $(document).ready(function () {
+        var params = {Action: 'get_banner'}
+        var url = 'http://127.0.0.1:1798/?'+make_url(params);
+        console.log(url);
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function(res) {
+                console.log(res);
+                $('#result').html(syntaxHighlight(res));
+            },
+        });
+    });
+</script>
+</body>
+</html>
