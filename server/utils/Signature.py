@@ -11,7 +11,7 @@
 
 from .tool import md5, get_current_timestamp
 from functools import wraps
-from flask import request
+from flask import request, jsonify
 
 class Signature(object):
     """ 接口签名认证 """
@@ -106,5 +106,5 @@ class Signature(object):
             if res["success"] is True:
                 return f(*args, **kwargs)
             else:
-                return res
+                return jsonify(res)
         return decorated_function

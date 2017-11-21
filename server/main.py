@@ -58,11 +58,8 @@ def Permission_denied(error=None):
 @app.route("/")
 @Sign.signature_required
 def index():
-    # 正确请求将返回以下内容，否则将被signature_required拦截，返回请求验证信息： {"msg": "error message", "success": False}
+    # 正确请求将返回以下内容，否则将被signature_required拦截，返回请求验证信息： {"msg": "Invaild message", "success": False}
     return jsonify(ping="pong")
 
-if __name__ == '__main__':
-    from config import GLOBAL
-    Host = GLOBAL["Host"]
-    Port = GLOBAL["Port"]
-    app.run(host=Host, port=int(Port), debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=1798, debug=True)

@@ -39,7 +39,7 @@ class RequestClient(object):
         if not isinstance(params, dict):
             raise TypeError("params is not a dict")
         # 获取当前时间戳
-        timestamp = get_current_timestamp() - 4
+        timestamp = get_current_timestamp() - 5
         # 设置公共参数
         publicParams = dict(accesskey_id=self._accesskey_id, version=self._version, timestamp=timestamp)
         # 添加加公共参数
